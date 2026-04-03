@@ -307,14 +307,6 @@ button {
     rgba(255, 251, 244, 0.82);
 }
 
-.install-panel__eyebrow {
-  margin: 0 0 0.35rem;
-  color: var(--accent);
-  font-size: 0.76rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-}
-
 .install-panel__title {
   margin: 0;
   font-size: 1.05rem;
