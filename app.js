@@ -1,5 +1,7 @@
 ﻿const config = window.__BIBLIA_CONFIG__;
 
+const TABLET_SIDEBAR_QUERY = "(max-width: 1180px)";
+
 if (!config || !Array.isArray(config.books) || config.books.length === 0) {
   throw new Error("O catálogo da Bíblia não foi carregado.");
 }
@@ -28,9 +30,12 @@ const state = {
   fromVerse: null,
   activeTestament: "AT",
   referencePreview: null,
+  sidebarOpen: false,
 };
 
 const elements = {
+  shell: document.querySelector("#shell"),
+  sidebar: document.querySelector("#sidebar"),
   bookSelect: document.querySelector("#bookSelect"),
   chapterInput: document.querySelector("#chapterInput"),
   verseInput: document.querySelector("#verseInput"),
@@ -45,8 +50,12 @@ const elements = {
   nextChapterButton: document.querySelector("#nextChapterButton"),
   testamentTabs: [...document.querySelectorAll(".tab")],
   translationMeta: document.querySelector("#translationMeta"),
+  menuToggleButton: document.querySelector("#menuToggleButton"),
+  closeSidebarButton: document.querySelector("#closeSidebarButton"),
+  sidebarBackdrop: document.querySelector("#sidebarBackdrop"),
 };
 
+const tabletSidebarMedia = window.matchMedia(TABLET_SIDEBAR_QUERY);
 let renderToken = 0;
 let referenceToken = 0;
 
@@ -57,11 +66,13 @@ function init() {
   populateBookButtons();
   bindEvents();
   syncStateFromHash();
+  syncSidebarUi();
   render();
 }
 
 function bindEvents() {
   window.addEventListener("hashchange", () => {
+    closeSidebar({ restoreFocus: false });
     closeReferencePreview({ rerender: false });
     syncStateFromHash();
     render();
@@ -78,6 +89,7 @@ function bindEvents() {
     const verseValue = elements.verseInput.value.trim();
     const verse = verseValue ? Math.max(1, parseInteger(verseValue, 1)) : null;
 
+    closeSidebar({ restoreFocus: false });
     updateHash({
       book: meta.slug,
       chapter,
@@ -95,6 +107,7 @@ function bindEvents() {
       return;
     }
 
+    closeSidebar({ restoreFocus: false });
     updateHash({
       book: button.dataset.book,
       chapter: 1,
@@ -112,6 +125,7 @@ function bindEvents() {
       return;
     }
 
+    closeSidebar({ restoreFocus: false });
     updateHash({
       book: state.book,
       chapter: Number(button.dataset.chapter),
@@ -130,6 +144,7 @@ function bindEvents() {
     }
 
     if (state.chapter > 1) {
+      closeSidebar({ restoreFocus: false });
       updateHash({
         book: state.book,
         chapter: state.chapter - 1,
@@ -144,6 +159,7 @@ function bindEvents() {
 
     const previousBook = config.books[meta.index - 1];
     if (previousBook) {
+      closeSidebar({ restoreFocus: false });
       updateHash({
         book: previousBook.slug,
         chapter: previousBook.chapterCount,
@@ -163,6 +179,7 @@ function bindEvents() {
     }
 
     if (state.chapter < meta.chapterCount) {
+      closeSidebar({ restoreFocus: false });
       updateHash({
         book: state.book,
         chapter: state.chapter + 1,
@@ -177,6 +194,7 @@ function bindEvents() {
 
     const nextBook = config.books[meta.index + 1];
     if (nextBook) {
+      closeSidebar({ restoreFocus: false });
       updateHash({
         book: nextBook.slug,
         chapter: 1,
@@ -196,6 +214,38 @@ function bindEvents() {
       renderTabs();
     });
   });
+
+  elements.menuToggleButton.addEventListener("click", () => {
+    toggleSidebar();
+  });
+
+  elements.closeSidebarButton.addEventListener("click", () => {
+    closeSidebar();
+  });
+
+  elements.sidebarBackdrop.addEventListener("click", () => {
+    closeSidebar();
+  });
+
+  window.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      closeSidebar();
+    }
+  });
+
+  const syncSidebarOnViewportChange = () => {
+    if (!isTabletSidebarLayout()) {
+      state.sidebarOpen = false;
+    }
+
+    syncSidebarUi();
+  };
+
+  if (typeof tabletSidebarMedia.addEventListener === "function") {
+    tabletSidebarMedia.addEventListener("change", syncSidebarOnViewportChange);
+  } else if (typeof tabletSidebarMedia.addListener === "function") {
+    tabletSidebarMedia.addListener(syncSidebarOnViewportChange);
+  }
 
   elements.verses.addEventListener("click", (event) => {
     const closeButton = event.target.closest("[data-close-reference]");
@@ -227,6 +277,7 @@ function bindEvents() {
 
     const verseButton = event.target.closest("[data-verse]");
     if (verseButton) {
+      closeSidebar({ restoreFocus: false });
       updateHash({
         book: state.book,
         chapter: state.chapter,
@@ -239,6 +290,50 @@ function bindEvents() {
     }
   });
 
+}
+
+function isTabletSidebarLayout() {
+  return tabletSidebarMedia.matches;
+}
+
+function toggleSidebar() {
+  if (!isTabletSidebarLayout()) {
+    return;
+  }
+
+  if (state.sidebarOpen) {
+    closeSidebar();
+    return;
+  }
+
+  state.sidebarOpen = true;
+  syncSidebarUi();
+}
+
+function closeSidebar(options = {}) {
+  const restoreFocus = options.restoreFocus !== false;
+  if (!state.sidebarOpen) {
+    syncSidebarUi();
+    return;
+  }
+
+  state.sidebarOpen = false;
+  syncSidebarUi();
+
+  if (restoreFocus) {
+    elements.menuToggleButton.focus();
+  }
+}
+
+function syncSidebarUi() {
+  const useTabletSidebar = isTabletSidebarLayout();
+  const isOpen = useTabletSidebar && state.sidebarOpen;
+
+  elements.shell.classList.toggle("is-sidebar-open", isOpen);
+  document.body.classList.toggle("is-sidebar-open", isOpen);
+  elements.menuToggleButton.hidden = !useTabletSidebar;
+  elements.menuToggleButton.setAttribute("aria-expanded", String(isOpen));
+  elements.sidebar.setAttribute("aria-hidden", String(useTabletSidebar && !isOpen));
 }
 
 function populateSelects() {
@@ -400,6 +495,8 @@ function renderVerse({ text, verseNumber, refMap }) {
   }
 
   const isFocused = state.verse && verseNumber === state.verse;
+  const bookName = getBookMeta(state.book)?.name || state.book;
+  const verseLabel = `${bookName} ${state.chapter}:${verseNumber}`;
   const verseKey = `${state.chapter}:${verseNumber}`;
   const references = refMap[verseKey] || [];
   const classes = ["verse"];
@@ -411,7 +508,7 @@ function renderVerse({ text, verseNumber, refMap }) {
   return `
     <article class="${classes.join(" ")}" id="${getVerseElementId(state.book, state.chapter, verseNumber)}">
       <div class="verse__head">
-        <button type="button" class="verse__number" data-verse="${verseNumber}" aria-label="Ir para o versículo ${verseNumber}">${verseNumber}</button>
+        <button type="button" class="verse__number" data-verse="${verseNumber}" aria-label="Ir para ${verseLabel}">${verseLabel}</button>
       </div>
       <div class="verse__body">
         <span class="verse__text">${escapeHtml(text)}</span>

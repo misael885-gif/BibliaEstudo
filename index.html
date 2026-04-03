@@ -9,8 +9,11 @@
   <script src="app.js" charset="utf-8" defer></script>
 </head>
 <body>
-  <div class="shell">
-    <aside class="sidebar">
+  <div id="shell" class="shell">
+    <aside id="sidebar" class="sidebar" aria-label="Navegação da Bíblia">
+      <div class="sidebar__mobile-actions">
+        <button type="button" id="closeSidebarButton" class="button button--ghost sidebar__close">Fechar navegação</button>
+      </div>
       <div class="brand">
         <p class="brand__eyebrow">Leitura e estudo</p>
         <h1 class="brand__title">Bíblia em Português</h1>
@@ -62,12 +65,25 @@
       </section>
     </aside>
 
+    <button type="button" id="sidebarBackdrop" class="sidebar-backdrop" aria-label="Fechar navegação"></button>
+
     <main class="reader">
       <header class="reader__header">
-        <div>
-          <p class="reader__eyebrow">Passagem atual</p>
-          <h2 id="passageTitle" class="reader__title"></h2>
-          <p id="passageSubtitle" class="reader__subtitle"></p>
+        <div class="reader__header-main">
+          <button
+            type="button"
+            id="menuToggleButton"
+            class="button button--ghost reader__menu"
+            aria-controls="sidebar"
+            aria-expanded="false"
+          >
+            Navegação
+          </button>
+          <div>
+            <p class="reader__eyebrow">Passagem atual</p>
+            <h2 id="passageTitle" class="reader__title"></h2>
+            <p id="passageSubtitle" class="reader__subtitle"></p>
+          </div>
         </div>
         <div class="reader__actions">
           <button type="button" id="prevChapterButton" class="button button--ghost">Capítulo anterior</button>
