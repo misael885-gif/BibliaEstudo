@@ -343,11 +343,13 @@ button {
 }
 
 .verse__number {
-  width: 2.4rem;
+  min-width: 2.4rem;
   height: 2.4rem;
-  border-radius: 50%;
+  padding: 0 0.75rem;
+  border-radius: 999px;
   color: var(--accent-strong);
   font-weight: 700;
+  white-space: nowrap;
 }
 
 .verse__body {

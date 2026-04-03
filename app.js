@@ -400,6 +400,8 @@ function renderVerse({ text, verseNumber, refMap }) {
   }
 
   const isFocused = state.verse && verseNumber === state.verse;
+  const bookName = getBookMeta(state.book)?.name || state.book;
+  const verseLabel = `${bookName} ${state.chapter}:${verseNumber}`;
   const verseKey = `${state.chapter}:${verseNumber}`;
   const references = refMap[verseKey] || [];
   const classes = ["verse"];
@@ -411,7 +413,7 @@ function renderVerse({ text, verseNumber, refMap }) {
   return `
     <article class="${classes.join(" ")}" id="${getVerseElementId(state.book, state.chapter, verseNumber)}">
       <div class="verse__head">
-        <button type="button" class="verse__number" data-verse="${verseNumber}" aria-label="Ir para o versículo ${verseNumber}">${verseNumber}</button>
+        <button type="button" class="verse__number" data-verse="${verseNumber}" aria-label="Ir para ${verseLabel}">${verseLabel}</button>
       </div>
       <div class="verse__body">
         <span class="verse__text">${escapeHtml(text)}</span>
