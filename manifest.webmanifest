@@ -1,0 +1,53 @@
+{
+  "id": "./",
+  "name": "Bíblia em Português",
+  "short_name": "Bíblia",
+  "description": "Leitura bíblica em português com referências cruzadas clicáveis para estudo.",
+  "lang": "pt-BR",
+  "dir": "ltr",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f7f2e6",
+  "theme_color": "#f7f2e6",
+  "categories": ["books", "education", "reference"],
+  "prefer_related_applications": false,
+  "icons": [
+    {
+      "src": "./icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Apocalipse 1",
+      "short_name": "Apocalipse",
+      "url": "./index.html#book=apocalipse&chapter=1"
+    },
+    {
+      "name": "Salmos 23",
+      "short_name": "Salmos 23",
+      "url": "./index.html#book=salmos&chapter=23"
+    },
+    {
+      "name": "João 3",
+      "short_name": "João 3",
+      "url": "./index.html#book=joao&chapter=3"
+    }
+  ]
+}
