@@ -1,0 +1,53 @@
+{
+  "id": "./index.html",
+  "name": "B\u00edblia em Portugu\u00eas",
+  "short_name": "B\u00edblia",
+  "description": "Leitura b\u00edblica em portugu\u00eas com refer\u00eancias cruzadas clic\u00e1veis para estudo.",
+  "lang": "pt-BR",
+  "dir": "ltr",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f7f2e6",
+  "theme_color": "#f7f2e6",
+  "categories": ["books", "education", "reference"],
+  "prefer_related_applications": false,
+  "icons": [
+    {
+      "src": "./icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Apocalipse 1",
+      "short_name": "Apocalipse",
+      "url": "./index.html#book=apocalipse&chapter=1"
+    },
+    {
+      "name": "Salmos 23",
+      "short_name": "Salmos 23",
+      "url": "./index.html#book=salmos&chapter=23"
+    },
+    {
+      "name": "Jo\u00e3o 3",
+      "short_name": "Jo\u00e3o 3",
+      "url": "./index.html#book=joao&chapter=3"
+    }
+  ]
+}

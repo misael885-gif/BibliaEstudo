@@ -1,0 +1,2 @@
+event=hotkey ATKD 0000003[012]
+action=/etc/acpi/eeepcvgatoggle.sh
