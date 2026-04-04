@@ -113,10 +113,22 @@
           </div>
         </div>
         <div class="reader__actions">
+          <button type="button" id="installAppButton" class="button button--secondary" hidden>Instalar app</button>
           <button type="button" id="prevChapterButton" class="button button--ghost">Capítulo anterior</button>
           <button type="button" id="nextChapterButton" class="button button--ghost">Próximo capítulo</button>
         </div>
       </header>
+
+      <section id="installPanel" class="install-panel" hidden aria-live="polite">
+        <div class="install-panel__content">
+          <h3 id="installPanelTitle" class="install-panel__title">Instalar a Bíblia</h3>
+          <p id="installPanelText" class="install-panel__text"></p>
+        </div>
+        <div class="install-panel__actions">
+          <button type="button" id="installActionButton" class="button button--primary" hidden>Instalar agora</button>
+          <button type="button" id="dismissInstallPanelButton" class="button button--ghost">Fechar</button>
+        </div>
+      </section>
 
       <section class="chapter-strip">
         <div class="chapter-strip__header">
