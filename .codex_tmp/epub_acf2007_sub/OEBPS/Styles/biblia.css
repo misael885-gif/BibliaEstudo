@@ -1,0 +1,69 @@
+@namespace h "http://www.w3.org/1999/xhtml";
+
+body {
+	margin: 1em;
+}
+
+p {
+	text-align:justify;
+	margin: 0;
+}
+
+.cap {
+	margin-top: 1em;
+	margin-bottom: 1em;
+}
+
+.sub {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+	text-align: center;
+	font-size: 80%;
+}
+
+.centro {
+	text-align: center;
+}
+
+table {
+	/*margin: auto;*/
+	vertical-align: middle;
+	width: 100%;
+}
+
+td {
+    /*height: 1.5em;*/
+	vertical-align: middle;
+	text-align: center;
+	/*padding: 5px;*/
+}
+
+.small {
+	/*font-size: 70%;*/
+}
+
+small {
+	font-size: 70%;
+	font-variant: small-caps;
+}
+
+sup {
+	font-size: 0.6em;
+    vertical-align: top;
+}
+
+a:link, a:visited {
+	color: blue;
+	text-decoration: none;
+}
+
+h1, h2 {
+	text-align: center;
+}
+
+hr {
+	width: 100%;
+	margin-left: 0px;
+	margin-right: 0px;
+	text-align: left;
+}

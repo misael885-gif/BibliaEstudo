@@ -1,8 +1,14 @@
 ﻿const config = window.__BIBLIA_CONFIG__;
 
+const TABLET_SIDEBAR_QUERY = "(max-width: 1180px)";
+
 if (!config || !Array.isArray(config.books) || config.books.length === 0) {
   throw new Error("O catálogo da Bíblia não foi carregado.");
 }
+
+const translations = getAvailableTranslations();
+const translationMap = Object.fromEntries(translations.map((translation) => [translation.code, translation]));
+const defaultTranslationCode = translationMap.ACF2007 ? "ACF2007" : translations[0].code;
 
 const store = {
   books: Object.create(null),
@@ -10,8 +16,17 @@ const store = {
   loading: new Map(),
 };
 
-window.__BIBLIA_REGISTER_BOOK__ = (slug, payload) => {
-  store.books[slug] = payload;
+window.__BIBLIA_REGISTER_BOOK__ = (translationCodeOrSlug, slugOrPayload, maybePayload) => {
+  const hasExplicitTranslation = typeof maybePayload !== "undefined";
+  const translationCode = hasExplicitTranslation ? translationCodeOrSlug : defaultTranslationCode;
+  const slug = hasExplicitTranslation ? slugOrPayload : translationCodeOrSlug;
+  const payload = hasExplicitTranslation ? maybePayload : slugOrPayload;
+
+  if (!store.books[translationCode]) {
+    store.books[translationCode] = Object.create(null);
+  }
+
+  store.books[translationCode][slug] = payload;
 };
 
 window.__BIBLIA_REGISTER_REFS__ = (slug, payload) => {
@@ -19,6 +34,7 @@ window.__BIBLIA_REGISTER_REFS__ = (slug, payload) => {
 };
 
 const state = {
+  translationCode: defaultTranslationCode,
   book: config.books[0].slug,
   chapter: 1,
   verse: null,
@@ -28,9 +44,15 @@ const state = {
   fromVerse: null,
   activeTestament: "AT",
   referencePreview: null,
+  sidebarOpen: false,
+  dailyVerse: null,
+  backToTopTarget: null,
 };
 
 const elements = {
+  shell: document.querySelector("#shell"),
+  sidebar: document.querySelector("#sidebar"),
+  translationSelect: document.querySelector("#translationSelect"),
   bookSelect: document.querySelector("#bookSelect"),
   chapterInput: document.querySelector("#chapterInput"),
   verseInput: document.querySelector("#verseInput"),
@@ -45,26 +67,78 @@ const elements = {
   nextChapterButton: document.querySelector("#nextChapterButton"),
   testamentTabs: [...document.querySelectorAll(".tab")],
   translationMeta: document.querySelector("#translationMeta"),
+  menuToggleButton: document.querySelector("#menuToggleButton"),
+  closeSidebarButton: document.querySelector("#closeSidebarButton"),
+  sidebarBackdrop: document.querySelector("#sidebarBackdrop"),
+  dailyVerseCard: document.querySelector("#dailyVerseCard"),
+  dailyGreeting: document.querySelector("#dailyGreeting"),
+  dailyVerseReference: document.querySelector("#dailyVerseReference"),
+  dailyVerseText: document.querySelector("#dailyVerseText"),
+  openDailyVerseButton: document.querySelector("#openDailyVerseButton"),
+  backToTopButton: document.querySelector("#backToTopButton"),
 };
 
+const tabletSidebarMedia = window.matchMedia(TABLET_SIDEBAR_QUERY);
 let renderToken = 0;
 let referenceToken = 0;
+let dailyVerseToken = 0;
 
 init();
 
 function init() {
+  normalizeInitialTranslation();
   populateSelects();
   populateBookButtons();
   bindEvents();
   syncStateFromHash();
+  syncSidebarUi();
   render();
+}
+
+function normalizeInitialTranslation() {
+  const currentHash = window.location.hash.replace(/^#/, "");
+  const params = new URLSearchParams(currentHash);
+
+  if (params.get("version") === defaultTranslationCode) {
+    return;
+  }
+
+  params.set("version", defaultTranslationCode);
+
+  if (!params.get("book")) {
+    params.set("book", config.books[0].slug);
+  }
+
+  if (!params.get("chapter")) {
+    params.set("chapter", "1");
+  }
+
+  const nextHash = params.toString();
+  if (nextHash !== currentHash) {
+    window.history.replaceState(null, "", `#${nextHash}`);
+  }
 }
 
 function bindEvents() {
   window.addEventListener("hashchange", () => {
+    closeSidebar({ restoreFocus: false });
     closeReferencePreview({ rerender: false });
     syncStateFromHash();
     render();
+  });
+
+  elements.translationSelect.addEventListener("change", () => {
+    closeSidebar({ restoreFocus: false });
+    updateHash({
+      translationCode: elements.translationSelect.value,
+      book: state.book,
+      chapter: state.chapter,
+      verse: state.verse,
+      end: state.end,
+      fromBook: null,
+      fromChapter: null,
+      fromVerse: null,
+    });
   });
 
   elements.jumpForm.addEventListener("submit", (event) => {
@@ -78,6 +152,7 @@ function bindEvents() {
     const verseValue = elements.verseInput.value.trim();
     const verse = verseValue ? Math.max(1, parseInteger(verseValue, 1)) : null;
 
+    closeSidebar({ restoreFocus: false });
     updateHash({
       book: meta.slug,
       chapter,
@@ -95,6 +170,7 @@ function bindEvents() {
       return;
     }
 
+    closeSidebar({ restoreFocus: false });
     updateHash({
       book: button.dataset.book,
       chapter: 1,
@@ -112,6 +188,7 @@ function bindEvents() {
       return;
     }
 
+    closeSidebar({ restoreFocus: false });
     updateHash({
       book: state.book,
       chapter: Number(button.dataset.chapter),
@@ -130,6 +207,7 @@ function bindEvents() {
     }
 
     if (state.chapter > 1) {
+      closeSidebar({ restoreFocus: false });
       updateHash({
         book: state.book,
         chapter: state.chapter - 1,
@@ -144,6 +222,7 @@ function bindEvents() {
 
     const previousBook = config.books[meta.index - 1];
     if (previousBook) {
+      closeSidebar({ restoreFocus: false });
       updateHash({
         book: previousBook.slug,
         chapter: previousBook.chapterCount,
@@ -163,6 +242,7 @@ function bindEvents() {
     }
 
     if (state.chapter < meta.chapterCount) {
+      closeSidebar({ restoreFocus: false });
       updateHash({
         book: state.book,
         chapter: state.chapter + 1,
@@ -177,6 +257,7 @@ function bindEvents() {
 
     const nextBook = config.books[meta.index + 1];
     if (nextBook) {
+      closeSidebar({ restoreFocus: false });
       updateHash({
         book: nextBook.slug,
         chapter: 1,
@@ -196,6 +277,70 @@ function bindEvents() {
       renderTabs();
     });
   });
+
+  elements.menuToggleButton.addEventListener("click", () => {
+    toggleSidebar();
+  });
+
+  elements.closeSidebarButton.addEventListener("click", () => {
+    closeSidebar();
+  });
+
+  elements.sidebarBackdrop.addEventListener("click", () => {
+    closeSidebar();
+  });
+
+  elements.openDailyVerseButton.addEventListener("click", () => {
+    if (!state.dailyVerse) {
+      return;
+    }
+
+    state.backToTopTarget = {
+      translationCode: state.translationCode,
+      book: state.dailyVerse.book,
+      chapter: state.dailyVerse.chapter,
+      verse: state.dailyVerse.verse,
+    };
+
+    closeSidebar({ restoreFocus: false });
+    updateHash({
+      translationCode: state.translationCode,
+      book: state.dailyVerse.book,
+      chapter: state.dailyVerse.chapter,
+      verse: state.dailyVerse.verse,
+      end: null,
+      fromBook: null,
+      fromChapter: null,
+      fromVerse: null,
+    });
+  });
+
+  elements.backToTopButton.addEventListener("click", () => {
+    elements.dailyVerseCard.scrollIntoView({ block: "start", behavior: "smooth" });
+  });
+
+  window.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      closeSidebar();
+    }
+  });
+
+  window.addEventListener("scroll", syncBackToTopButton, { passive: true });
+  window.addEventListener("resize", syncBackToTopButton);
+
+  const syncSidebarOnViewportChange = () => {
+    if (!isTabletSidebarLayout()) {
+      state.sidebarOpen = false;
+    }
+
+    syncSidebarUi();
+  };
+
+  if (typeof tabletSidebarMedia.addEventListener === "function") {
+    tabletSidebarMedia.addEventListener("change", syncSidebarOnViewportChange);
+  } else if (typeof tabletSidebarMedia.addListener === "function") {
+    tabletSidebarMedia.addListener(syncSidebarOnViewportChange);
+  }
 
   elements.verses.addEventListener("click", (event) => {
     const closeButton = event.target.closest("[data-close-reference]");
@@ -227,6 +372,7 @@ function bindEvents() {
 
     const verseButton = event.target.closest("[data-verse]");
     if (verseButton) {
+      closeSidebar({ restoreFocus: false });
       updateHash({
         book: state.book,
         chapter: state.chapter,
@@ -241,12 +387,64 @@ function bindEvents() {
 
 }
 
+function isTabletSidebarLayout() {
+  return tabletSidebarMedia.matches;
+}
+
+function toggleSidebar() {
+  if (!isTabletSidebarLayout()) {
+    return;
+  }
+
+  if (state.sidebarOpen) {
+    closeSidebar();
+    return;
+  }
+
+  state.sidebarOpen = true;
+  syncSidebarUi();
+}
+
+function closeSidebar(options = {}) {
+  const restoreFocus = options.restoreFocus !== false;
+  if (!state.sidebarOpen) {
+    syncSidebarUi();
+    return;
+  }
+
+  state.sidebarOpen = false;
+  syncSidebarUi();
+
+  if (restoreFocus) {
+    elements.menuToggleButton.focus();
+  }
+}
+
+function syncSidebarUi() {
+  const useTabletSidebar = isTabletSidebarLayout();
+  const isOpen = useTabletSidebar && state.sidebarOpen;
+
+  elements.shell.classList.toggle("is-sidebar-open", isOpen);
+  document.body.classList.toggle("is-sidebar-open", isOpen);
+  elements.menuToggleButton.hidden = !useTabletSidebar;
+  elements.menuToggleButton.setAttribute("aria-expanded", String(isOpen));
+  elements.sidebar.setAttribute("aria-hidden", String(useTabletSidebar && !isOpen));
+}
+
 function populateSelects() {
+  elements.translationSelect.innerHTML = translations
+    .map(
+      (translation) =>
+        `<option value="${translation.code}">${escapeHtml(translation.shortName || translation.name)}</option>`
+    )
+    .join("");
+
   elements.bookSelect.innerHTML = config.books
     .map((book) => `<option value="${book.slug}">${escapeHtml(book.name)}</option>`)
     .join("");
 
-  elements.translationMeta.textContent = `${config.translation.name} · ${config.translation.license}`;
+  const activeTranslation = getActiveTranslation();
+  elements.translationMeta.textContent = `${activeTranslation.name} · ${activeTranslation.license}`;
 }
 
 function populateBookButtons() {
@@ -268,9 +466,12 @@ function populateBookButtons() {
 
 function syncStateFromHash() {
   const params = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+  const requestedTranslation = params.get("version");
   const requestedBook = params.get("book");
   const meta = getBookMeta(requestedBook) || config.books[0];
+  const translation = getTranslationMeta(requestedTranslation) || getTranslationMeta(defaultTranslationCode);
 
+  state.translationCode = translation.code;
   state.book = meta.slug;
   state.chapter = clampNumber(parseInteger(params.get("chapter"), 1), 1, meta.chapterCount);
   state.verse = params.has("verse") ? Math.max(1, parseInteger(params.get("verse"), 1)) : null;
@@ -279,27 +480,43 @@ function syncStateFromHash() {
   state.fromChapter = state.fromBook ? Math.max(1, parseInteger(params.get("fromChapter"), 1)) : null;
   state.fromVerse = state.fromBook ? Math.max(1, parseInteger(params.get("fromVerse"), 1)) : null;
   state.activeTestament = meta.testament;
+
+  if (state.backToTopTarget && !matchesPassageTarget(state.backToTopTarget)) {
+    state.backToTopTarget = null;
+  }
 }
 
 function updateHash(nextState) {
   closeReferencePreview({ rerender: false });
 
+  const mergedState = {
+    translationCode: nextState.translationCode || state.translationCode || defaultTranslationCode,
+    book: nextState.book || state.book,
+    chapter: nextState.chapter || state.chapter,
+    verse: Object.prototype.hasOwnProperty.call(nextState, "verse") ? nextState.verse : state.verse,
+    end: Object.prototype.hasOwnProperty.call(nextState, "end") ? nextState.end : state.end,
+    fromBook: Object.prototype.hasOwnProperty.call(nextState, "fromBook") ? nextState.fromBook : state.fromBook,
+    fromChapter: Object.prototype.hasOwnProperty.call(nextState, "fromChapter") ? nextState.fromChapter : state.fromChapter,
+    fromVerse: Object.prototype.hasOwnProperty.call(nextState, "fromVerse") ? nextState.fromVerse : state.fromVerse,
+  };
+
   const params = new URLSearchParams();
-  params.set("book", nextState.book);
-  params.set("chapter", String(nextState.chapter));
+  params.set("version", mergedState.translationCode);
+  params.set("book", mergedState.book);
+  params.set("chapter", String(mergedState.chapter));
 
-  if (nextState.verse) {
-    params.set("verse", String(nextState.verse));
+  if (mergedState.verse) {
+    params.set("verse", String(mergedState.verse));
   }
 
-  if (nextState.end && nextState.end !== nextState.verse) {
-    params.set("end", String(nextState.end));
+  if (mergedState.end && mergedState.end !== mergedState.verse) {
+    params.set("end", String(mergedState.end));
   }
 
-  if (nextState.fromBook && nextState.fromChapter && nextState.fromVerse) {
-    params.set("fromBook", nextState.fromBook);
-    params.set("fromChapter", String(nextState.fromChapter));
-    params.set("fromVerse", String(nextState.fromVerse));
+  if (mergedState.fromBook && mergedState.fromChapter && mergedState.fromVerse) {
+    params.set("fromBook", mergedState.fromBook);
+    params.set("fromChapter", String(mergedState.fromChapter));
+    params.set("fromVerse", String(mergedState.fromVerse));
   }
 
   const nextHash = params.toString();
@@ -316,14 +533,16 @@ async function render(options = {}) {
   const skipFocus = Boolean(options.skipFocus);
   const currentToken = ++renderToken;
   const meta = getBookMeta(state.book);
+  const activeTranslation = getActiveTranslation();
   if (!meta) {
     return;
   }
 
+  renderDailyVerseCard();
   setLoading(true, "Carregando texto...");
 
   try {
-    await Promise.all([loadBookData(state.book), loadRefData(state.book)]);
+    await Promise.all([loadBookData(state.translationCode, state.book), loadRefData(state.book)]);
   } catch (error) {
     elements.verses.innerHTML = `
       <article class="verse">
@@ -338,20 +557,24 @@ async function render(options = {}) {
     return;
   }
 
-  const chapters = store.books[state.book] || [];
+  const translationBooks = store.books[state.translationCode] || {};
+  const chapters = translationBooks[state.book] || [];
   const chapterVerses = chapters[state.chapter - 1] || [];
   const refMap = store.refs[state.book] || {};
 
   elements.passageTitle.textContent = `${meta.name} ${state.chapter}`;
-  elements.passageSubtitle.textContent = `${config.translation.name} · capítulo ${state.chapter} de ${meta.chapterCount}`;
+  elements.passageSubtitle.textContent = `${activeTranslation.name} · capítulo ${state.chapter} de ${meta.chapterCount}`;
+  elements.translationSelect.value = state.translationCode;
   elements.bookSelect.value = state.book;
   elements.chapterInput.value = String(state.chapter);
   elements.verseInput.value = state.verse ? String(state.verse) : "";
+  elements.translationMeta.textContent = `${activeTranslation.name} · ${activeTranslation.license}`;
 
   renderTabs();
   renderBookButtons();
   renderChapterButtons(meta.chapterCount);
   renderReferenceBanner();
+  syncBackToTopButton();
 
   elements.verses.innerHTML = chapterVerses
     .map((text, index) => renderVerse({ text, verseNumber: index + 1, refMap }))
@@ -359,6 +582,7 @@ async function render(options = {}) {
     .join("");
 
   setLoading(false, "");
+  syncBackToTopButton();
 
   if (!skipFocus) {
     requestAnimationFrame(() => {
@@ -394,12 +618,116 @@ function renderReferenceBanner() {
   return;
 }
 
+async function renderDailyVerseCard() {
+  const now = new Date();
+  const dateKey = getLocalDateKey(now);
+  const period = getGreetingPeriod(now);
+  const greeting = getGreetingForTime(now);
+  const activeTranslation = getActiveTranslation();
+  const selection = getDailyVerseSelection(now);
+
+  if (
+    state.dailyVerse &&
+    state.dailyVerse.translationCode === state.translationCode &&
+    state.dailyVerse.dateKey === dateKey
+  ) {
+    renderDailyVerseContent(state.dailyVerse, greeting, activeTranslation, period);
+    return;
+  }
+
+  renderDailyVerseLoading(selection, greeting, activeTranslation, period);
+  const token = ++dailyVerseToken;
+
+  try {
+    await loadBookData(state.translationCode, selection.book);
+  } catch (error) {
+    if (token !== dailyVerseToken) {
+      return;
+    }
+
+    state.dailyVerse = null;
+    renderDailyVerseError(greeting, period);
+    return;
+  }
+
+  if (token !== dailyVerseToken) {
+    return;
+  }
+
+  const translationBooks = store.books[state.translationCode] || {};
+  const chapters = translationBooks[selection.book] || [];
+  const chapterVerses = chapters[selection.chapter - 1] || [];
+  const pickedVerse = pickDailyVerseFromChapter(
+    chapterVerses,
+    `${selection.dateKey}:${selection.book}:${selection.chapter}:verse`
+  );
+
+  if (!pickedVerse) {
+    state.dailyVerse = null;
+    renderDailyVerseError(greeting, period);
+    return;
+  }
+
+  state.dailyVerse = {
+    translationCode: state.translationCode,
+    dateKey: selection.dateKey,
+    book: selection.book,
+    chapter: selection.chapter,
+    verse: pickedVerse.verse,
+    text: pickedVerse.text,
+  };
+
+  renderDailyVerseContent(state.dailyVerse, greeting, activeTranslation, period);
+}
+
+function renderDailyVerseLoading(selection, greeting, translation, period) {
+  const bookMeta = getBookMeta(selection.book);
+  elements.dailyVerseCard.dataset.period = period;
+  elements.dailyGreeting.textContent = greeting;
+  elements.dailyVerseReference.textContent = bookMeta
+    ? `${bookMeta.name} ${selection.chapter} · ${translation.shortName || translation.name}`
+    : translation.shortName || translation.name;
+  elements.dailyVerseText.textContent = "Preparando o versículo de hoje...";
+  elements.openDailyVerseButton.disabled = true;
+  syncBackToTopButton();
+}
+
+function renderDailyVerseContent(dailyVerse, greeting, translation, period) {
+  const bookMeta = getBookMeta(dailyVerse.book);
+  if (!bookMeta) {
+    renderDailyVerseError(greeting, period);
+    return;
+  }
+
+  elements.dailyVerseCard.dataset.period = period;
+  elements.dailyGreeting.textContent = greeting;
+  elements.dailyVerseReference.textContent = `${bookMeta.name} ${dailyVerse.chapter}:${dailyVerse.verse} · ${translation.shortName || translation.name}`;
+  elements.dailyVerseText.textContent = dailyVerse.text;
+  elements.openDailyVerseButton.disabled = false;
+  elements.openDailyVerseButton.setAttribute(
+    "aria-label",
+    `Abrir ${bookMeta.name} ${dailyVerse.chapter}:${dailyVerse.verse}`
+  );
+  syncBackToTopButton();
+}
+
+function renderDailyVerseError(greeting, period) {
+  elements.dailyVerseCard.dataset.period = period;
+  elements.dailyGreeting.textContent = greeting;
+  elements.dailyVerseReference.textContent = "Versículo do dia";
+  elements.dailyVerseText.textContent = "Não foi possível carregar a passagem de hoje agora.";
+  elements.openDailyVerseButton.disabled = true;
+  syncBackToTopButton();
+}
+
 function renderVerse({ text, verseNumber, refMap }) {
   if (!text) {
     return "";
   }
 
   const isFocused = state.verse && verseNumber === state.verse;
+  const bookName = getBookMeta(state.book)?.name || state.book;
+  const verseLabel = `${bookName} ${state.chapter}:${verseNumber}`;
   const verseKey = `${state.chapter}:${verseNumber}`;
   const references = refMap[verseKey] || [];
   const classes = ["verse"];
@@ -411,7 +739,7 @@ function renderVerse({ text, verseNumber, refMap }) {
   return `
     <article class="${classes.join(" ")}" id="${getVerseElementId(state.book, state.chapter, verseNumber)}">
       <div class="verse__head">
-        <button type="button" class="verse__number" data-verse="${verseNumber}" aria-label="Ir para o versículo ${verseNumber}">${verseNumber}</button>
+        <button type="button" class="verse__number" data-verse="${verseNumber}" aria-label="Ir para ${verseLabel}">${verseLabel}</button>
       </div>
       <div class="verse__body">
         <span class="verse__text">${escapeHtml(text)}</span>
@@ -431,6 +759,60 @@ function renderVerse({ text, verseNumber, refMap }) {
       }
     </article>
   `;
+}
+
+function getGreetingPeriod(date = new Date()) {
+  const hour = date.getHours();
+  if (hour < 12) {
+    return "morning";
+  }
+
+  if (hour < 18) {
+    return "afternoon";
+  }
+
+  return "night";
+}
+
+function getGreetingForTime(date = new Date()) {
+  const period = getGreetingPeriod(date);
+  if (period === "morning") {
+    return "Bom dia, Deus esteja conosco!";
+  }
+
+  if (period === "afternoon") {
+    return "Boa tarde, Deus esteja conosco!";
+  }
+
+  return "Boa noite, Deus esteja conosco!";
+}
+
+function getDailyVerseSelection(date = new Date()) {
+  const dateKey = getLocalDateKey(date);
+  const bookIndex = pickSeededIndex(`${dateKey}:book`, config.books.length);
+  const book = config.books[bookIndex];
+  const chapter = pickSeededIndex(`${dateKey}:${book.slug}:chapter`, book.chapterCount) + 1;
+
+  return {
+    dateKey,
+    book: book.slug,
+    chapter,
+  };
+}
+
+function pickDailyVerseFromChapter(chapterVerses, seed) {
+  const availableVerses = chapterVerses
+    .map((text, index) => ({
+      verse: index + 1,
+      text,
+    }))
+    .filter((item) => typeof item.text === "string" && item.text.trim());
+
+  if (availableVerses.length === 0) {
+    return null;
+  }
+
+  return availableVerses[pickSeededIndex(seed, availableVerses.length)];
 }
 
 function renderReferenceChip(reference, sourceVerse) {
@@ -549,7 +931,7 @@ async function openReferencePreview(previewRequest) {
   render({ skipFocus: true });
 
   try {
-    await loadBookData(targetBook.slug);
+    await loadBookData(state.translationCode, targetBook.slug);
   } catch (error) {
     if (token !== referenceToken) {
       return;
@@ -569,7 +951,8 @@ async function openReferencePreview(previewRequest) {
     return;
   }
 
-  const chapters = store.books[targetBook.slug] || [];
+  const translationBooks = store.books[state.translationCode] || {};
+  const chapters = translationBooks[targetBook.slug] || [];
   const chapterVerses = chapters[previewRequest.targetChapter - 1] || [];
   const verses = [];
 
@@ -611,6 +994,7 @@ function focusVerse() {
   }
 
   target.scrollIntoView({ block: "center", behavior: "smooth" });
+  window.setTimeout(syncBackToTopButton, 280);
 }
 
 function setLoading(isLoading, message) {
@@ -618,12 +1002,17 @@ function setLoading(isLoading, message) {
   elements.readerStatus.textContent = message;
 }
 
-async function loadBookData(slug) {
-  if (store.books[slug]) {
+async function loadBookData(translationCode, slug) {
+  if (store.books[translationCode]?.[slug]) {
     return;
   }
 
-  await loadScript(`book:${slug}`, `data/books/${slug}.js`);
+  const translation = getTranslationMeta(translationCode);
+  if (!translation) {
+    throw new Error(`Tradução desconhecida: ${translationCode}`);
+  }
+
+  await loadScript(`book:${translationCode}:${slug}`, `${translation.dataPath}/${slug}.js`);
 }
 
 async function loadRefData(slug) {
@@ -655,12 +1044,93 @@ function loadScript(key, src) {
   return promise;
 }
 
+function getAvailableTranslations() {
+  const registeredTranslations = Array.isArray(window.__BIBLIA_TRANSLATIONS__) ? window.__BIBLIA_TRANSLATIONS__ : [];
+  if (registeredTranslations.length > 0) {
+    return registeredTranslations.map((translation) => ({
+      ...translation,
+      dataPath: translation.dataPath || "data/books",
+    }));
+  }
+
+  return [
+    {
+      ...config.translation,
+      shortName: config.translation.code,
+      dataPath: "data/books",
+    },
+  ];
+}
+
+function getTranslationMeta(code) {
+  return translationMap[code] || null;
+}
+
+function getActiveTranslation() {
+  return getTranslationMeta(state.translationCode) || getTranslationMeta(defaultTranslationCode);
+}
+
 function getBookMeta(slug) {
   return config.books.find((book) => book.slug === slug) || null;
 }
 
 function getVerseElementId(book, chapter, verse) {
   return `verse-${book}-${chapter}-${verse}`;
+}
+
+function syncBackToTopButton() {
+  const shouldShow = shouldShowBackToTopButton();
+  elements.backToTopButton.hidden = !shouldShow;
+}
+
+function shouldShowBackToTopButton() {
+  if (!state.backToTopTarget) {
+    return false;
+  }
+
+  if (!matchesPassageTarget(state.backToTopTarget)) {
+    return false;
+  }
+
+  return getScrollTop() > 24;
+}
+
+function matchesPassageTarget(target) {
+  if (!target) {
+    return false;
+  }
+
+  return (
+    state.translationCode === target.translationCode &&
+    state.book === target.book &&
+    state.chapter === target.chapter &&
+    state.verse === target.verse
+  );
+}
+
+function getScrollTop() {
+  return window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0;
+}
+
+function getLocalDateKey(date = new Date()) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function pickSeededIndex(seed, max) {
+  if (!Number.isFinite(max) || max <= 0) {
+    return 0;
+  }
+
+  let hash = 2166136261;
+  for (const char of seed) {
+    hash ^= char.charCodeAt(0);
+    hash = Math.imul(hash, 16777619);
+  }
+
+  return (hash >>> 0) % max;
 }
 
 function parseInteger(value, fallback) {
