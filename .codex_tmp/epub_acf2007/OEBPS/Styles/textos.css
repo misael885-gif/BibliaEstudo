@@ -1,0 +1,29 @@
+@namespace h "http://www.w3.org/1999/xhtml";
+
+body {
+	margin: 1em;
+}
+
+p {
+	text-align:justify;
+}
+
+.centro {
+	text-align: center;
+}
+
+.small {font-variant:small-caps;}
+
+a:link {
+	color:blue;
+	text-decoration:none;
+}
+
+a:visited {
+	color:blue;
+	text-decoration:none;
+}
+
+h1, h2, h3 {
+	text-align: center;
+}

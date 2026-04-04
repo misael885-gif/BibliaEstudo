@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<package unique-identifier="BookID" version="2.0" xmlns="http://www.idpf.org/2007/opf">
+  <metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:opf="http://www.idpf.org/2007/opf">
+    <dc:identifier id="BookID" opf:scheme="UUID">urn:uuid:fe1e6997-5702-4d84-b98f-939a0c525656</dc:identifier>
+    <dc:title>ACF 2007</dc:title>
+    <dc:creator opf:role="aut">SBTB</dc:creator>
+    <dc:language>pt</dc:language>
+    <dc:rights>Distribuiçao autorizada pela SBTB</dc:rights>
+    <dc:description>Bíblia Almeida Corrigida Fiel 2007</dc:description>
+    <dc:publisher>Fábio Medeiros</dc:publisher>
+    <dc:date opf:event="modification">2016-07-28</dc:date>
+    <dc:identifier opf:scheme="siriarah">C3E89E26</dc:identifier>
+    <meta name="cover" content="cover.jpeg"/>
+    <meta content="0.9.3" name="Sigil version"/>
+  </metadata>
+  <manifest>
+    <item href="toc.ncx" id="ncx" media-type="application/x-dtbncx+xml"/>
+    <item href="Images/cover.jpeg" id="cover.jpeg" media-type="image/jpeg"/>
+    <item href="Styles/biblia.css" id="biblia.css" media-type="text/css"/>
+    <item href="Styles/capa.css" id="capa.css" media-type="text/css"/>
+    <item href="Text/01_Gn.html" id="x01_Gn.html" media-type="application/xhtml+xml"/>
+    <item href="Text/02_Ex.html" id="x02_Ex.html" media-type="application/xhtml+xml"/>
+    <item href="Text/03_Lv.html" id="x03_Lv.html" media-type="application/xhtml+xml"/>
+    <item href="Text/04_Nm.html" id="x04_Nm.html" media-type="application/xhtml+xml"/>
+    <item href="Text/05_Dt.html" id="x05_Dt.html" media-type="application/xhtml+xml"/>
+    <item href="Text/06_Js.html" id="x06_Js.html" media-type="application/xhtml+xml"/>
+    <item href="Text/07_Jz.html" id="x07_Jz.html" media-type="application/xhtml+xml"/>
+    <item href="Text/08_Rt.html" id="x08_Rt.html" media-type="application/xhtml+xml"/>
+    <item href="Text/09_1Sm.html" id="x09_1Sm.html" media-type="application/xhtml+xml"/>
+    <item href="Text/10_2Sm.html" id="x10_2Sm.html" media-type="application/xhtml+xml"/>
+    <item href="Text/11_1Rs.html" id="x11_1Rs.html" media-type="application/xhtml+xml"/>
+    <item href="Text/12_2Rs.html" id="x12_2Rs.html" media-type="application/xhtml+xml"/>
+    <item href="Text/13_1Cr.html" id="x13_1Cr.html" media-type="application/xhtml+xml"/>
+    <item href="Text/14_2Cr.html" id="x14_2Cr.html" media-type="application/xhtml+xml"/>
+    <item href="Text/15_Ed.html" id="x15_Ed.html" media-type="application/xhtml+xml"/>
+    <item href="Text/16_Ne.html" id="x16_Ne.html" media-type="application/xhtml+xml"/>
+    <item href="Text/17_Et.html" id="x17_Et.html" media-type="application/xhtml+xml"/>
+    <item href="Text/18_Jo.html" id="x18_Jo.html" media-type="application/xhtml+xml"/>
+    <item href="Text/19_Sl_2.html" id="x19_Sl_2.html" media-type="application/xhtml+xml"/>
+    <item href="Text/20_Pv.html" id="x20_Pv.html" media-type="application/xhtml+xml"/>
+    <item href="Text/21_Ec.html" id="x21_Ec.html" media-type="application/xhtml+xml"/>
+    <item href="Text/22_Ct.html" id="x22_Ct.html" media-type="application/xhtml+xml"/>
+    <item href="Text/23_Is.html" id="x23_Is.html" media-type="application/xhtml+xml"/>
+    <item href="Text/24_Jr.html" id="x24_Jr.html" media-type="application/xhtml+xml"/>
+    <item href="Text/25_Lm.html" id="x25_Lm.html" media-type="application/xhtml+xml"/>
+    <item href="Text/26_Ez.html" id="x26_Ez.html" media-type="application/xhtml+xml"/>
+    <item href="Text/27_Dn.html" id="x27_Dn.html" media-type="application/xhtml+xml"/>
+    <item href="Text/28_Os.html" id="x28_Os.html" media-type="application/xhtml+xml"/>
+    <item href="Text/29_Jl.html" id="x29_Jl.html" media-type="application/xhtml+xml"/>
+    <item href="Text/30_Am.html" id="x30_Am.html" media-type="application/xhtml+xml"/>
+    <item href="Text/31_Ob.html" id="x31_Ob.html" media-type="application/xhtml+xml"/>
+    <item href="Text/32_Jn.html" id="x32_Jn.html" media-type="application/xhtml+xml"/>
+    <item href="Text/33_Mq.html" id="x33_Mq.html" media-type="application/xhtml+xml"/>
+    <item href="Text/34_Na.html" id="x34_Na.html" media-type="application/xhtml+xml"/>
+    <item href="Text/35_Hc.html" id="x35_Hc.html" media-type="application/xhtml+xml"/>
+    <item href="Text/36_Sf.html" id="x36_Sf.html" media-type="application/xhtml+xml"/>
+    <item href="Text/37_Ag.html" id="x37_Ag.html" media-type="application/xhtml+xml"/>
+    <item href="Text/38_Zc.html" id="x38_Zc.html" media-type="application/xhtml+xml"/>
+    <item href="Text/39_Ml.html" id="x39_Ml.html" media-type="application/xhtml+xml"/>
+    <item href="Text/40_Mt.html" id="x40_Mt.html" media-type="application/xhtml+xml"/>
+    <item href="Text/41_Mc.html" id="x41_Mc.html" media-type="application/xhtml+xml"/>
+    <item href="Text/42_Lc.html" id="x42_Lc.html" media-type="application/xhtml+xml"/>
+    <item href="Text/43_Jo.html" id="x43_Jo.html" media-type="application/xhtml+xml"/>
+    <item href="Text/44_At.html" id="x44_At.html" media-type="application/xhtml+xml"/>
+    <item href="Text/45_Rm.html" id="x45_Rm.html" media-type="application/xhtml+xml"/>
+    <item href="Text/46_1Co.html" id="x46_1Co.html" media-type="application/xhtml+xml"/>
+    <item href="Text/47_2Co.html" id="x47_2Co.html" media-type="application/xhtml+xml"/>
+    <item href="Text/48_Gl.html" id="x48_Gl.html" media-type="application/xhtml+xml"/>
+    <item href="Text/49_Ef.html" id="x49_Ef.html" media-type="application/xhtml+xml"/>
+    <item href="Text/50_Fp.html" id="x50_Fp.html" media-type="application/xhtml+xml"/>
+    <item href="Text/51_Cl.html" id="x51_Cl.html" media-type="application/xhtml+xml"/>
+    <item href="Text/52_1Ts.html" id="x52_1Ts.html" media-type="application/xhtml+xml"/>
+    <item href="Text/53_2Ts.html" id="x53_2Ts.html" media-type="application/xhtml+xml"/>
+    <item href="Text/54_1Tm.html" id="x54_1Tm.html" media-type="application/xhtml+xml"/>
+    <item href="Text/55_2Tm.html" id="x55_2Tm.html" media-type="application/xhtml+xml"/>
+    <item href="Text/56_Tt.html" id="x56_Tt.html" media-type="application/xhtml+xml"/>
+    <item href="Text/57_Fm.html" id="x57_Fm.html" media-type="application/xhtml+xml"/>
+    <item href="Text/58_Hb.html" id="x58_Hb.html" media-type="application/xhtml+xml"/>
+    <item href="Text/59_Tg.html" id="x59_Tg.html" media-type="application/xhtml+xml"/>
+    <item href="Text/60_1Pe.html" id="x60_1Pe.html" media-type="application/xhtml+xml"/>
+    <item href="Text/61_2Pe.html" id="x61_2Pe.html" media-type="application/xhtml+xml"/>
+    <item href="Text/62_1Jo.html" id="x62_1Jo.html" media-type="application/xhtml+xml"/>
+    <item href="Text/63_2Jo.html" id="x63_2Jo.html" media-type="application/xhtml+xml"/>
+    <item href="Text/64_3Jo.html" id="x64_3Jo.html" media-type="application/xhtml+xml"/>
+    <item href="Text/65_Jd.html" id="x65_Jd.html" media-type="application/xhtml+xml"/>
+    <item href="Text/66_Ap.html" id="x66_Ap.html" media-type="application/xhtml+xml"/>
+    <item href="Text/NT2007.html" id="NT2007.html" media-type="application/xhtml+xml"/>
+    <item href="Text/VT2007.html" id="VT2007.html" media-type="application/xhtml+xml"/>
+    <item href="Text/capa.xhtml" id="capa.xhtml" media-type="application/xhtml+xml"/>
+    <item href="Text/introducao.html" id="introducao.html" media-type="application/xhtml+xml"/>
+    <item href="Text/sobreACF2007.html" id="sobreACF2007.html" media-type="application/xhtml+xml"/>
+    <item href="Styles/textos.css" id="textos.css" media-type="text/css"/>
+    <item href="Text/19_Sl.html" id="x19_Sl.html" media-type="application/xhtml+xml"/>
+  </manifest>
+  <spine toc="ncx">
+    <itemref idref="capa.xhtml"/>
+    <itemref idref="sobreACF2007.html"/>
+    <itemref idref="introducao.html"/>
+    <itemref idref="VT2007.html"/>
+    <itemref idref="x01_Gn.html"/>
+    <itemref idref="x02_Ex.html"/>
+    <itemref idref="x03_Lv.html"/>
+    <itemref idref="x04_Nm.html"/>
+    <itemref idref="x05_Dt.html"/>
+    <itemref idref="x06_Js.html"/>
+    <itemref idref="x07_Jz.html"/>
+    <itemref idref="x08_Rt.html"/>
+    <itemref idref="x09_1Sm.html"/>
+    <itemref idref="x10_2Sm.html"/>
+    <itemref idref="x11_1Rs.html"/>
+    <itemref idref="x12_2Rs.html"/>
+    <itemref idref="x13_1Cr.html"/>
+    <itemref idref="x14_2Cr.html"/>
+    <itemref idref="x15_Ed.html"/>
+    <itemref idref="x16_Ne.html"/>
+    <itemref idref="x17_Et.html"/>
+    <itemref idref="x18_Jo.html"/>
+    <itemref idref="x19_Sl.html"/>
+    <itemref idref="x19_Sl_2.html"/>
+    <itemref idref="x20_Pv.html"/>
+    <itemref idref="x21_Ec.html"/>
+    <itemref idref="x22_Ct.html"/>
+    <itemref idref="x23_Is.html"/>
+    <itemref idref="x24_Jr.html"/>
+    <itemref idref="x25_Lm.html"/>
+    <itemref idref="x26_Ez.html"/>
+    <itemref idref="x27_Dn.html"/>
+    <itemref idref="x28_Os.html"/>
+    <itemref idref="x29_Jl.html"/>
+    <itemref idref="x30_Am.html"/>
+    <itemref idref="x31_Ob.html"/>
+    <itemref idref="x32_Jn.html"/>
+    <itemref idref="x33_Mq.html"/>
+    <itemref idref="x34_Na.html"/>
+    <itemref idref="x35_Hc.html"/>
+    <itemref idref="x36_Sf.html"/>
+    <itemref idref="x37_Ag.html"/>
+    <itemref idref="x38_Zc.html"/>
+    <itemref idref="x39_Ml.html"/>
+    <itemref idref="NT2007.html"/>
+    <itemref idref="x40_Mt.html"/>
+    <itemref idref="x41_Mc.html"/>
+    <itemref idref="x42_Lc.html"/>
+    <itemref idref="x43_Jo.html"/>
+    <itemref idref="x44_At.html"/>
+    <itemref idref="x45_Rm.html"/>
+    <itemref idref="x46_1Co.html"/>
+    <itemref idref="x47_2Co.html"/>
+    <itemref idref="x48_Gl.html"/>
+    <itemref idref="x49_Ef.html"/>
+    <itemref idref="x50_Fp.html"/>
+    <itemref idref="x51_Cl.html"/>
+    <itemref idref="x52_1Ts.html"/>
+    <itemref idref="x53_2Ts.html"/>
+    <itemref idref="x54_1Tm.html"/>
+    <itemref idref="x55_2Tm.html"/>
+    <itemref idref="x56_Tt.html"/>
+    <itemref idref="x57_Fm.html"/>
+    <itemref idref="x58_Hb.html"/>
+    <itemref idref="x59_Tg.html"/>
+    <itemref idref="x60_1Pe.html"/>
+    <itemref idref="x61_2Pe.html"/>
+    <itemref idref="x62_1Jo.html"/>
+    <itemref idref="x63_2Jo.html"/>
+    <itemref idref="x64_3Jo.html"/>
+    <itemref idref="x65_Jd.html"/>
+    <itemref idref="x66_Ap.html"/>
+  </spine>
+  <guide>
+    <reference href="Text/capa.xhtml" title="Cover" type="cover"></reference>
+  </guide>
+</package>
