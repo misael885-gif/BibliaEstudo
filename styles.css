@@ -20,6 +20,8 @@
 
 html {
   scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 body {
@@ -40,6 +42,11 @@ select {
 
 button {
   cursor: pointer;
+  touch-action: manipulation;
+}
+
+button:disabled {
+  cursor: default;
 }
 
 .shell {
@@ -53,6 +60,7 @@ button {
   top: 0;
   max-height: 100vh;
   overflow: auto;
+  -webkit-overflow-scrolling: touch;
   padding: 1.5rem;
   border-right: 1px solid var(--border);
   background:
@@ -64,6 +72,12 @@ button {
       transparent 1px,
       transparent 16px
     );
+}
+
+.sidebar__mobile-actions,
+.sidebar-backdrop,
+.reader__menu {
+  display: none;
 }
 
 .brand {
@@ -169,6 +183,7 @@ button {
 .button {
   border: 0;
   border-radius: 999px;
+  min-height: 2.75rem;
   padding: 0.75rem 1.05rem;
   transition: transform 0.16s ease, background 0.16s ease, color 0.16s ease;
 }
@@ -179,6 +194,12 @@ button {
 .chapter-grid__button:hover,
 .cross-reference:hover {
   transform: translateY(-1px);
+}
+
+.button:disabled,
+.button:disabled:hover {
+  opacity: 0.72;
+  transform: none;
 }
 
 .button--primary {
@@ -203,6 +224,7 @@ button {
   flex: 1;
   border: 1px solid rgba(48, 77, 58, 0.15);
   border-radius: 999px;
+  min-height: 2.75rem;
   padding: 0.65rem 0.8rem;
   color: var(--accent-strong);
   background: rgba(255, 251, 244, 0.8);
@@ -228,6 +250,7 @@ button {
 }
 
 .book-grid__button {
+  min-height: 2.85rem;
   padding: 0.72rem 0.75rem;
   border-radius: 14px;
   text-align: left;
@@ -247,13 +270,120 @@ button {
   padding: 1.8rem clamp(1rem, 3vw, 2rem) 2rem;
 }
 
+.daily-verse,
 .reader__header,
+.install-panel,
 .chapter-strip,
 .reader-status {
   border: 1px solid var(--border);
   border-radius: var(--radius);
   background: rgba(255, 251, 244, 0.76);
   box-shadow: var(--shadow);
+}
+
+.daily-verse {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 1.2rem;
+  align-items: end;
+  padding: 1.35rem 1.4rem;
+  margin-bottom: 1rem;
+  border-color: rgba(194, 155, 33, 0.18);
+  background:
+    radial-gradient(circle at top right, rgba(244, 216, 106, 0.34), transparent 30%),
+    linear-gradient(145deg, rgba(255, 252, 242, 0.96), rgba(246, 239, 220, 0.94) 58%, rgba(223, 232, 225, 0.88));
+  overflow: hidden;
+  position: relative;
+}
+
+.daily-verse::after {
+  content: "";
+  position: absolute;
+  right: -3.5rem;
+  bottom: -4rem;
+  width: 12rem;
+  height: 12rem;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.24), transparent 68%);
+  pointer-events: none;
+}
+
+.daily-verse[data-period="afternoon"] {
+  background:
+    radial-gradient(circle at top right, rgba(244, 216, 106, 0.28), transparent 30%),
+    linear-gradient(145deg, rgba(255, 248, 233, 0.96), rgba(240, 231, 208, 0.94) 58%, rgba(221, 229, 214, 0.88));
+}
+
+.daily-verse[data-period="night"] {
+  background:
+    radial-gradient(circle at top right, rgba(244, 216, 106, 0.18), transparent 28%),
+    linear-gradient(145deg, rgba(241, 236, 226, 0.98), rgba(228, 221, 209, 0.94) 58%, rgba(212, 221, 214, 0.9));
+}
+
+.daily-verse__content {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.daily-verse__eyebrow {
+  margin: 0 0 0.4rem;
+  color: var(--accent);
+  font-size: 0.78rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.daily-verse__greeting {
+  margin: 0;
+  line-height: 1.08;
+  font-size: clamp(1.8rem, 3vw, 2.7rem);
+  max-width: 13ch;
+  text-wrap: balance;
+  letter-spacing: -0.02em;
+}
+
+.daily-verse__reference {
+  margin: 0.3rem 0 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  width: fit-content;
+  max-width: 100%;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  color: var(--accent-strong);
+  font-size: 0.96rem;
+  letter-spacing: 0.04em;
+  background: rgba(255, 250, 240, 0.72);
+}
+
+.daily-verse__text {
+  margin: 0.55rem 0 0;
+  padding: 0.9rem 0 0 1rem;
+  border-left: 3px solid rgba(194, 155, 33, 0.42);
+  color: var(--ink);
+  line-height: 1.8;
+  font-size: 1.12rem;
+  font-style: normal;
+  white-space: normal;
+}
+
+.daily-verse__actions {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+}
+
+.back-to-top {
+  position: fixed;
+  right: 1.3rem;
+  bottom: 1.3rem;
+  z-index: 25;
+  box-shadow: 0 16px 28px rgba(34, 26, 18, 0.18);
 }
 
 .reader__header {
@@ -264,11 +394,47 @@ button {
   padding: 1.2rem 1.25rem;
 }
 
+.reader__header-main {
+  display: grid;
+  gap: 0.8rem;
+  min-width: 0;
+}
+
 .reader__title {
   font-size: clamp(2rem, 3vw, 3rem);
 }
 
 .reader__actions {
+  display: flex;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.install-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 1rem;
+  align-items: center;
+  padding: 1rem 1.1rem;
+  margin-top: 1rem;
+  background:
+    linear-gradient(135deg, rgba(255, 250, 232, 0.86), rgba(248, 236, 176, 0.42)),
+    rgba(255, 251, 244, 0.82);
+}
+
+.install-panel__title {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.install-panel__text {
+  margin: 0.35rem 0 0;
+  color: var(--ink-soft);
+  line-height: 1.55;
+}
+
+.install-panel__actions {
   display: flex;
   gap: 0.65rem;
   flex-wrap: wrap;
@@ -293,6 +459,7 @@ button {
 
 .chapter-grid__button {
   min-width: 3rem;
+  min-height: 2.75rem;
   padding: 0.65rem 0.75rem;
   border-radius: 999px;
   color: var(--ink);
@@ -340,14 +507,21 @@ button {
   display: flex;
   align-items: center;
   gap: 0.75rem;
+  flex-wrap: wrap;
 }
 
 .verse__number {
-  width: 2.4rem;
-  height: 2.4rem;
-  border-radius: 50%;
+  min-width: 2.4rem;
+  max-width: 100%;
+  min-height: 2.75rem;
+  padding: 0.35rem 0.85rem;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   color: var(--accent-strong);
   font-weight: 700;
+  white-space: nowrap;
 }
 
 .verse__body {
@@ -390,6 +564,7 @@ button {
 
 .cross-reference {
   border-radius: 999px;
+  min-height: 2.6rem;
   padding: 0.5rem 0.72rem;
   color: var(--accent-strong);
 }
@@ -488,20 +663,118 @@ button {
   }
 }
 
-@media (max-width: 1100px) {
+@media (max-width: 1180px) {
+  body.is-sidebar-open {
+    overflow: hidden;
+  }
+
   .shell {
-    grid-template-columns: 1fr;
+    display: block;
   }
 
   .sidebar {
-    position: static;
+    position: fixed;
+    inset: 0 auto 0 0;
+    z-index: 30;
+    width: min(28rem, calc(100vw - 1rem));
+    max-width: 100%;
     max-height: none;
-    border-right: 0;
-    border-bottom: 1px solid var(--border);
+    height: 100vh;
+    padding: 1.15rem;
+    border-right: 1px solid var(--border);
+    border-bottom: 0;
+    box-shadow: 0 24px 52px rgba(24, 18, 12, 0.18);
+    transform: translateX(calc(-100% - 1rem));
+    transition: transform 0.24s ease;
+  }
+
+  .shell.is-sidebar-open .sidebar {
+    transform: translateX(0);
+  }
+
+  .sidebar__mobile-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 0.8rem;
+  }
+
+  .sidebar__close,
+  .reader__menu {
+    min-height: 2.85rem;
+  }
+
+  .sidebar-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 20;
+    border: 0;
+    padding: 0;
+    background: rgba(34, 26, 18, 0.32);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.24s ease;
+  }
+
+  .shell.is-sidebar-open .sidebar-backdrop {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .reader {
+    padding: 1.25rem clamp(1rem, 3vw, 1.5rem) 1.5rem;
+  }
+
+  .daily-verse,
+  .reader__header {
+    padding: 1rem 1.1rem;
+  }
+
+  .reader__menu {
+    display: inline-flex;
+    align-items: center;
+    align-self: flex-start;
+  }
+
+  .chapter-strip,
+  .install-panel,
+  .reader-status,
+  .verse {
+    scroll-margin-top: 1rem;
+  }
+}
+
+@media (max-width: 900px) {
+  .daily-verse,
+  .reader__header {
+    display: grid;
+  }
+
+  .daily-verse {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+  }
+
+  .install-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .reader__actions {
+    justify-content: flex-start;
+  }
+
+  .install-panel__actions {
+    justify-content: flex-start;
   }
 }
 
 @media (max-width: 760px) {
+  .sidebar {
+    width: min(100vw, 24rem);
+    padding: 1rem;
+  }
+
+  .daily-verse,
   .reader__header {
     padding: 1rem;
   }
@@ -510,12 +783,72 @@ button {
     grid-template-columns: 1fr;
   }
 
-  .reader__header {
-    display: grid;
+  .daily-verse {
+    gap: 0.95rem;
+    padding: 1rem;
+    margin-bottom: 0.9rem;
+    border-radius: 20px;
+    background:
+      radial-gradient(circle at top right, rgba(244, 216, 106, 0.28), transparent 34%),
+      linear-gradient(180deg, rgba(255, 251, 241, 0.98), rgba(244, 237, 219, 0.95));
   }
 
-  .reader__actions {
-    justify-content: flex-start;
+  .daily-verse::after {
+    right: -4.5rem;
+    bottom: auto;
+    top: -4rem;
+    width: 10rem;
+    height: 10rem;
+  }
+
+  .daily-verse__eyebrow {
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+  }
+
+  .daily-verse__content {
+    gap: 0.18rem;
+  }
+
+  .daily-verse__greeting {
+    max-width: none;
+    font-size: clamp(1.18rem, 5.8vw, 1.52rem);
+    line-height: 1.12;
+  }
+
+  .daily-verse__reference {
+    padding: 0.3rem 0.58rem;
+    font-size: 0.8rem;
+    line-height: 1.35;
+    letter-spacing: 0.02em;
+  }
+
+  .daily-verse__text {
+    margin-top: 0.12rem;
+    padding: 0.82rem 0.88rem;
+    border-left: 0;
+    border-top: 3px solid rgba(194, 155, 33, 0.38);
+    border-radius: 14px;
+    background: rgba(255, 252, 245, 0.82);
+    font-size: 0.96rem;
+    line-height: 1.58;
+  }
+
+  .daily-verse__actions {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .daily-verse__actions .button {
+    width: 100%;
+    min-height: 3rem;
+  }
+
+  .back-to-top {
+    right: 1rem;
+    left: 1rem;
+    bottom: 1rem;
+    min-height: 3rem;
   }
 
   .inline-reference__header,
@@ -523,12 +856,32 @@ button {
     display: grid;
     grid-template-columns: 1fr;
   }
+
+  .daily-verse__text {
+    padding-left: 0.88rem;
+  }
 }
 
 @media (max-width: 520px) {
-  .sidebar,
   .reader {
     padding: 1rem;
+  }
+
+  .daily-verse {
+    padding: 0.95rem;
+  }
+
+  .daily-verse__greeting {
+    font-size: 1.1rem;
+  }
+
+  .daily-verse__reference {
+    font-size: 0.76rem;
+  }
+
+  .daily-verse__text {
+    font-size: 0.92rem;
+    line-height: 1.54;
   }
 
   .book-grid {

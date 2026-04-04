@@ -4,13 +4,20 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Bíblia de Estudo</title>
+  <meta name="theme-color" content="#f7f2e6">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="styles.css">
   <script src="data/catalog.js" charset="utf-8"></script>
+  <script src="data/translations.js" charset="utf-8"></script>
   <script src="app.js" charset="utf-8" defer></script>
+  <script src="pwa.js?v=remove-install" charset="utf-8" defer></script>
 </head>
 <body>
-  <div class="shell">
-    <aside class="sidebar">
+  <div id="shell" class="shell">
+    <aside id="sidebar" class="sidebar" aria-label="Navegação da Bíblia">
+      <div class="sidebar__mobile-actions">
+        <button type="button" id="closeSidebarButton" class="button button--ghost sidebar__close">Fechar navegação</button>
+      </div>
       <div class="brand">
         <p class="brand__eyebrow">Leitura e estudo</p>
         <h1 class="brand__title">Bíblia em Português</h1>
@@ -20,9 +27,13 @@
       <section class="panel jump-panel">
         <div class="panel__header">
           <h2>Ir para o texto</h2>
-          <p>Escolha o livro, capítulo e versículo.</p>
+          <p>Escolha a versão, o livro, capítulo e versículo.</p>
         </div>
         <form id="jumpForm" class="jump-form">
+          <label class="field">
+            <span>Versão</span>
+            <select id="translationSelect"></select>
+          </label>
           <label class="field">
             <span>Livro</span>
             <select id="bookSelect"></select>
@@ -57,17 +68,42 @@
         <div class="panel__header">
           <h2>Base textual</h2>
         </div>
-        <p class="source-note">Tradução aberta em português com referências cruzadas organizadas para estudo e leitura contínua.</p>
+        <p class="source-note">Versões abertas em português com referências cruzadas organizadas para estudo e leitura contínua.</p>
         <p id="translationMeta" class="source-note source-note--muted"></p>
       </section>
     </aside>
 
+    <button type="button" id="sidebarBackdrop" class="sidebar-backdrop" aria-label="Fechar navegação"></button>
+
     <main class="reader">
+      <section id="dailyVerseCard" class="daily-verse" aria-live="polite">
+        <div class="daily-verse__content">
+          <p class="daily-verse__eyebrow">Versículo do dia</p>
+          <h2 id="dailyGreeting" class="daily-verse__greeting">Bom dia, Deus esteja conosco!</h2>
+          <p id="dailyVerseReference" class="daily-verse__reference">Carregando passagem...</p>
+          <blockquote id="dailyVerseText" class="daily-verse__text">Preparando uma palavra para hoje...</blockquote>
+        </div>
+        <div class="daily-verse__actions">
+          <button type="button" id="openDailyVerseButton" class="button button--primary">Abrir versículo do dia</button>
+        </div>
+      </section>
+
       <header class="reader__header">
-        <div>
-          <p class="reader__eyebrow">Passagem atual</p>
-          <h2 id="passageTitle" class="reader__title"></h2>
-          <p id="passageSubtitle" class="reader__subtitle"></p>
+        <div class="reader__header-main">
+          <button
+            type="button"
+            id="menuToggleButton"
+            class="button button--ghost reader__menu"
+            aria-controls="sidebar"
+            aria-expanded="false"
+          >
+            Navegação
+          </button>
+          <div>
+            <p class="reader__eyebrow">Passagem atual</p>
+            <h2 id="passageTitle" class="reader__title"></h2>
+            <p id="passageSubtitle" class="reader__subtitle"></p>
+          </div>
         </div>
         <div class="reader__actions">
           <button type="button" id="prevChapterButton" class="button button--ghost">Capítulo anterior</button>
@@ -85,6 +121,9 @@
 
       <section id="readerStatus" class="reader-status" hidden>Carregando texto...</section>
       <section id="verses" class="verses"></section>
+      <button type="button" id="backToTopButton" class="button button--primary back-to-top" hidden>
+        Voltar ao topo
+      </button>
     </main>
   </div>
 </body>
